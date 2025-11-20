@@ -1,188 +1,154 @@
-# LLM-Generated Disambiguation Dataset Evaluation
-
-A comprehensive framework for evaluating the quality of LLM-generated disambiguation datasets using another LLM as a judge. This tool assesses how well a generator LLM creates facets and taxonomies for ambiguous questions.
-
 ## Overview
 
-This evaluation system measures multiple quality dimensions of disambiguation datasets:
+This project develops and evaluates systems where LLMs identify ambiguity in questions and generate high-quality facets that explain disambiguation question-answer pairs. The research employs a three-stage training pipeline using Qwen 2.5 7B for facet generation with Gemini serving as an evaluation judge.
 
-- **Taxonomy Accuracy**: Correctness of ambiguity type classification
-- **Facet Coverage**: Completeness of disambiguation questions
-- **Facet-Taxonomy Alignment**: Consistency between facets and assigned taxonomy
-- **Ambiguity Detection**: Accuracy of ambiguity flagging
-- **Disambiguation Quality**: Effectiveness of disambiguation questions
-- **QA Alignment**: Consistency between questions and answers
+# Facet Generation for Question Disambiguation
+
+A machine learning research project focused on improving facet generation in question disambiguation systems using large language models (LLMs).
+
+## Research Goals
+
+- Develop methodologies for improving facet generation in question disambiguation systems
+- Train models to better understand and categorize different types of ambiguity
+- Create comprehensive evaluation frameworks for assessing facet quality
+- Implement iterative improvement through preference optimization
 
 ## Taxonomy Categories
 
-The evaluation uses a comprehensive taxonomy system with the following categories:
+The system categorizes ambiguity across three main types:
 
-1. **Entity Reference**: Ambiguity due to multiple entities sharing the same name
-2. **Underspecified Common Nouns**: Generic nouns that could refer to multiple specific instances
-3. **Degree of an Action**: Questions about the extent or intensity of an action
-4. **Event Specification**: Ambiguity about which specific event is being referenced
-5. **Temporal Ambiguity**: Unclear time references
-6. **Spatial Ambiguity**: Unclear location references
-7. **Quantifier Scope**: Ambiguous scope of quantifiers like "all," "some," "most"
-8. **Contextual Dependency**: Questions requiring additional context
-9. **Multiple Valid Interpretations**: Questions with several legitimate meanings
+1. **Entity Reference** - Ambiguity arising from unclear entity references
+2. **Underspecified Common Nouns** - Questions with vague or incomplete noun specifications
+3. **Degree of an Action** - Ambiguity in the extent or intensity of actions
+
+## Methodology
+
+### Three-Stage Training Pipeline
+
+#### Stage 1: Data Preparation
+- Generate diverse facet candidates
+- Apply backwards filtering for validation
+- Ensure generated facets can explain gold standard QA pairs
+
+#### Stage 2: Supervised Fine-Tuning
+- Train on curated datasets
+- Focus on taxonomy-facet alignment
+- Improve ambiguity detection capabilities
+
+#### Stage 3: Iterative Preference Optimization
+- Implement Direct Preference Optimization (DPO)
+- Generate multiple output hypotheses
+- Learn preferences through multi-criteria scoring
+
+### Backwards Filtering
+
+A core validation technique that tests whether generated facets can actually explain or generate the gold standard QA pairs used for disambiguation. This provides automatic quality control by ensuring retained facets explain gold answers by design.
+
+## Evaluation Framework
+
+The system assesses six core quality metrics:
+
+1. **Taxonomy Accuracy** - Correct classification of ambiguity types
+2. **Facet Coverage** - Completeness of generated facets
+3. **Facet-Taxonomy Alignment** - Consistency between facets and assigned categories
+4. **Ambiguity Detection** - Ability to identify ambiguous questions
+5. **QA Alignment Quality** - How well facets explain disambiguation QA pairs
+6. **Double Validation** - Quality checks during both preparation and improvement phases
+
+## Technical Stack
+
+- **Primary Model**: Qwen 2.5 7B (facet generation)
+- **Evaluation Judge**: Gemini
+- **Programming Language**: Python
+- **Data Processing**: pandas
+- **Dataset Size**: ~1000 samples
+
+### Data Structure
+
+The dataset contains:
+- Questions
+- Taxonomies
+- Facets
+- Disambiguation questions
+- QA pairs
+
+## Key Features
+
+- **Multi-path Hypothesis Generation**: Integration with Stargate algorithm for exploring different solution paths
+- **Comprehensive Error Handling**: Retry logic and rate limiting management
+- **Scalable Evaluation**: Progressive testing from small samples to full dataset
+- **Privacy-Conscious**: Designed for sensitive research data management
+
+## Current Status
+
+- ✅ Three-stage training pipeline implemented
+- ✅ Comprehensive evaluation framework developed
+- ✅ Backwards filtering validation technique established
+- ✅ Small-scale testing completed
+- 🔄 Scaling to complete dataset in progress
+- 🔄 Research proposal document in development
+
+## Future Work
+
+- [ ] Complete full dataset evaluation
+- [ ] Implement Stargate algorithm integration
+- [ ] Develop iterative DPO over multiple rounds
+- [ ] Address over-application of Entity Reference category
+- [ ] Explore multi-criteria preference learning
+- [ ] Publish research findings
 
 ## Installation
 
 ```bash
 # Clone the repository
-git clone <repository-url>
-cd <project-directory>
+git clone [repository-url]
 
-# Install required dependencies
-pip install openai python-dotenv pandas numpy
-```
+# Install dependencies
+pip install -r requirements.txt
 
-## Configuration
-
-Create a `.env` file in the project root:
-
-```env
-OPENAI_API_KEY=your_api_key_here
+# Configure API keys
+# Add your API keys for Qwen and Gemini in config file
 ```
 
 ## Usage
 
-### Basic Evaluation
-
 ```python
-from evaluation_script import evaluate_dataset
+# Example usage for facet generation
+from facet_generator import FacetGenerator
 
-# Evaluate your dataset
-results = evaluate_dataset(
-    dataset_path="path/to/your/dataset.json",
-    sample_size=100,  # Optional: evaluate subset
-    output_path="evaluation_results.json"
-)
+generator = FacetGenerator(model="qwen-2.5-7b")
+facets = generator.generate(question="Your ambiguous question here")
+
+# Run evaluation
+from evaluator import FacetEvaluator
+
+evaluator = FacetEvaluator(judge_model="gemini")
+results = evaluator.evaluate(facets, gold_qa_pairs)
 ```
 
-### Full Dataset Evaluation
+## Research Principles
 
-```python
-# Evaluate the complete dataset
-results = evaluate_dataset(
-    dataset_path="data/full_dataset.json",
-    output_path="results/full_evaluation.json"
-)
-```
-
-### Custom Evaluation Parameters
-
-```python
-results = evaluate_dataset(
-    dataset_path="data/dataset.json",
-    model="gpt-4",  # Specify evaluation model
-    temperature=0.1,  # Control randomness
-    max_workers=5  # Parallel processing
-)
-```
-
-## Output Format
-
-The evaluation produces detailed JSON reports with:
-
-```json
-{
-  "overall_metrics": {
-    "taxonomy_agreement": 0.85,
-    "facet_coverage_score": 0.78,
-    "facet_taxonomy_alignment": 0.92,
-    "ambiguity_flag_accuracy": 0.88,
-    "avg_disambiguation_quality": 4.2,
-    "qa_alignment_score": 0.91
-  },
-  "detailed_results": [...],
-  "error_analysis": {...},
-  "recommendations": [...]
-}
-```
-
-## Key Metrics
-
-### Taxonomy Agreement
-Measures whether the LLM judge agrees with the generator's taxonomy classification.
-
-### Facet Coverage Score
-Assesses completeness of generated disambiguation questions for identified ambiguities.
-
-### Facet-Taxonomy Alignment
-Evaluates consistency between facets and their assigned taxonomy categories.
-
-### Ambiguity Flag Accuracy
-Checks if questions are correctly flagged as ambiguous or unambiguous.
-
-### Disambiguation Quality Score
-Rates the effectiveness of disambiguation questions (1-5 scale).
-
-### QA Alignment Score
-Measures consistency between questions, disambiguation facets, and answers.
-
-## Common Issues
-
-### Over-application of "Entity Reference"
-The evaluation framework includes specific guidance to prevent over-classification of questions as "Entity Reference" ambiguity. Ensure your prompts include clear examples distinguishing entity ambiguity from other types.
-
-### Missing Components
-If your dataset has incomplete entries (missing facets, taxonomies, or QA pairs), the evaluation will flag these and provide detailed error reports.
-
-## Project Structure
-
-```
-.
-├── evaluation_script.py      # Main evaluation logic
-├── prompts/
-│   ├── taxonomy_eval.txt     # Taxonomy evaluation prompt
-│   ├── facet_eval.txt        # Facet coverage evaluation prompt
-│   └── alignment_eval.txt    # Alignment evaluation prompt
-├── data/
-│   └── dataset.json          # Input dataset
-├── results/
-│   └── evaluation_*.json     # Output evaluation results
-└── README.md
-```
-
-## Best Practices
-
-1. **Start Small**: Test on a sample before evaluating the full dataset
-2. **Review Prompts**: Ensure taxonomy definitions are clear and comprehensive
-3. **Iterative Refinement**: Use evaluation insights to improve generator prompts
-4. **Error Analysis**: Pay attention to common failure patterns in the error reports
-5. **Validate Results**: Manually review a subset of evaluations for quality assurance
-
-## Troubleshooting
-
-### Import Errors
-Ensure all required packages are installed:
-```bash
-pip install -r requirements.txt
-```
-
-### API Rate Limits
-Adjust the `max_workers` parameter to control parallel requests and avoid rate limiting.
-
-### Memory Issues
-For large datasets, process in batches using the `sample_size` parameter.
+1. **Double Validation**: Check facet quality during both initial preparation and iterative improvement
+2. **Comprehensive Evaluation**: Assess multiple dimensions rather than single metrics
+3. **Systematic Approach**: Test on small samples before scaling up
+4. **Backwards Verification**: Use gold QA pairs as validation criteria
 
 ## Contributing
 
-Contributions are welcome! Please submit pull requests with:
-- Clear descriptions of changes
-- Updated tests if applicable
-- Documentation updates
-
-## License
-
-[Your License Here]
-
-## Contact
-
-[Your Contact Information]
+This is an academic research project conducted through UIUC. For questions or collaboration opportunities, please contact the research team.
+```
 
 ## Acknowledgments
 
-Built using OpenAI's API for LLM-as-judge evaluation methodology.
+- University of Illinois, Urbana-Champaign
+- Research advisor and team members
+- [Add other acknowledgments]
+
+## Contact
+
+For questions about this research, please contact:
+- itsbhoomika.r@gmail.com
+
+---
+
+**Note**: This repository contains sensitive research data and is intended for academic use only.
