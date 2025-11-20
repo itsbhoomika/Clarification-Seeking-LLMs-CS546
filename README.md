@@ -1,6 +1,6 @@
 ## Overview
 
-This project develops and evaluates systems where LLMs identify ambiguity in questions and generate high-quality facets that explain disambiguation question-answer pairs. The research employs a three-stage training pipeline using Qwen 2.5 7B for facet generation with Gemini serving as an evaluation judge.
+This project develops and evaluates systems where LLMs identify ambiguity in questions and generate high-quality facets that explain disambiguation question-answer pairs. The research employs a three-stage training pipeline using Gemini 2.5 Flash API and Qwen 2.5 7B for facet generation with Gemini serving as an evaluation judge.
 
 # Facet Generation for Question Disambiguation
 
