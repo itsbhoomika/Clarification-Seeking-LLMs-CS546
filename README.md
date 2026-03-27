@@ -1,6 +1,6 @@
 ## Overview
 
-All Code Link: https://drive.google.com/drive/u/0/folders/1oYp5PF9D24aeYMnBi1Fou9l66Bsn4MH0
+All Code Files Link: https://drive.google.com/drive/u/0/folders/1oYp5PF9D24aeYMnBi1Fou9l66Bsn4MH0
 
 This project develops and evaluates systems where LLMs identify ambiguity in questions and generate high-quality facets that explain disambiguation question-answer pairs. The research employs a three-stage training pipeline using Gemini 2.5 Flash API and Qwen 2.5 7B for facet generation with Gemini serving as an evaluation judge.
 
